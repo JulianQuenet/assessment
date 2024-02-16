@@ -1,39 +1,49 @@
-import { useState, useEffect } from 'react'
-import { FileViewer } from './components/file-viewer'
+import { useState, useEffect } from "react";
+import { FileViewer } from "./components/file-viewer";
 
 function App() {
-  const [directory, setDirectory] = useState<any[]>()
+  const [directory, setDirectory] = useState<any[]>();
+  const [files, setFiles] = useState<any[]>();
 
-  const URL:String = "http://localhost:8080/directory"
+  const DIRECTORY_URL: String = "http://localhost:8080/directory";
+  const GETTER_URL: String = "http://localhost:8080/files";
+
+
+  const getFiles = async () => {
+    try {
+      const res = await fetch(`${GETTER_URL}`);
+      const data = await res.json();
+      setFiles(data);
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const getDirectory = async () => {
+    try {
+      const res = await fetch(`${DIRECTORY_URL}`);
+      const data = await res.json();
+      setDirectory(data);
+    } catch (error) {
+      alert(
+        `${error}, logged from the getter function in the main app component`
+      );
+    }
+  };
 
   useEffect(() => {
-    const getList = async () => {
-      try {
-        const res = await fetch(`${URL}`);
-        const data = await res.json();
-        setDirectory(data);
-        if (!res) {
-          throw new Error(`${res} returned null`);
-        }
-      } catch (error) {
-        alert(error);
-      }
-    };
-    getList();
+    getDirectory();
+    getFiles();
   }, []);
 
-
-  // if(directory?.length){
-  //   console.log(directory)
-  // }
+ 
 
   return (
     <>
-      <h1>File Viewer</h1>
-      <FileViewer directory={directory}/>
-      
+      <h1>File/folder Viewer</h1>
+      <FileViewer directory={directory} firstLoadFiles={files} />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

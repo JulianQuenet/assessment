@@ -32,10 +32,6 @@ button {
 button:hover {
   border-color: #646cff;
 }
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
 
 .wrapper {
   display: grid;
@@ -57,11 +53,16 @@ button:focus-visible {
   transition-duration: 0.2s;
 }
 
+/* .sorting-select{
+  margin-left: auto;
+  grid-column: span 3;
+} */
+
 
 .table-header{
   padding: 5px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3,1fr);
   align-items: center;
   min-height: 10px;
   background-color: rgb(255, 255, 255);
