@@ -4,13 +4,14 @@ interface ListItemFileProps {
     size : any,
     date : any,
     id : string,
+    type: string,
     onClick : (Event:any)=>void
 }
 
 
 
 export const ListItemFile = (props:ListItemFileProps)=>{
-   const {name, size, date, id, onClick }=props
+   const {name, size, date, id, onClick, type }=props
    
    const getAddedTime = (dateString:string|Date) =>{
  
@@ -33,9 +34,13 @@ export const ListItemFile = (props:ListItemFileProps)=>{
             <div  className="size">
             {`${size} KB`}
             </div>
+            <div>
+                {type}
+            </div>
             <div  className="date">
             {getAddedTime(date)}
             </div>
+            
          </div>
         </>
     )

@@ -35,7 +35,7 @@ button:hover {
 
 .wrapper {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   min-height: 20px;
   padding: 5px;
   padding-left: 10px;
@@ -44,7 +44,10 @@ button:hover {
   cursor: pointer;
   border-radius: 10px;
   transition: all 0.2s ease-in-out;
+  font-size: smaller;
 }
+
+
 
 
 .wrapper:hover {
@@ -62,7 +65,7 @@ button:hover {
 .table-header{
   padding: 5px;
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(4,1fr);
   align-items: center;
   min-height: 10px;
   background-color: rgb(255, 255, 255);

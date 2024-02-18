@@ -15,6 +15,21 @@ const fileContainerStyles: CSSProperties = {
   margin: "0 auto",
   width: "70vw",
 };
+
+const selectInputsStyles:CSSProperties={
+  margin: "1px 0",
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+}
+
+const fileContainerDivStyle:CSSProperties={
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    margin: "1px",
+}
+
 const fileContainerStylesInner: CSSProperties = {
   margin: "0 auto",
   borderRadius: "10px",
@@ -247,12 +262,7 @@ export const FileViewer = (props: FileViewerProps) => {
       <div id="file-container" style={fileContainerStyles}>
         <div
           id="inputs"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            margin: "1px",
-          }}
+          style={fileContainerDivStyle}
         >
           <div id="inputs-search" style={{ marginRight: "auto" }}>
             <form
@@ -271,12 +281,7 @@ export const FileViewer = (props: FileViewerProps) => {
 
           <div
             id="inputs-select"
-            style={{
-              margin: "1px 0",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-            }}
+            style={selectInputsStyles}
           >
             {paths.length > 1 && (
               <IconButton color="primary" onClick={handlePrev}>
@@ -303,6 +308,7 @@ export const FileViewer = (props: FileViewerProps) => {
           <div className="table-header">
             <div>Name</div>
             <div>Size</div>
+            <div>Type</div>
             <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
             Date modified
              <Select
@@ -331,6 +337,7 @@ export const FileViewer = (props: FileViewerProps) => {
                 name={element.name}
                 size={element.size}
                 date={element.lastModified}
+                type={element.type}
               />
             );
           })}
