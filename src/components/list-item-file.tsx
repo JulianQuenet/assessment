@@ -9,11 +9,11 @@ interface ListItemFileProps {
 }
 
 
-
+//Gets the mapped props and creates a wrapper for them 
 export const ListItemFile = (props:ListItemFileProps)=>{
    const {name, size, date, id, onClick, type }=props
    
-   const getAddedTime = (dateString:string|Date) =>{
+   const getAddedTime = (dateString:string|Date) =>{//Gets the epoch time and formats it 
  
     const date = new Date(dateString);
     const month = date.toLocaleString('default', { month: 'short' });

@@ -5,7 +5,7 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { ListItemFile } from "./list-item-file";
 import Fuse from "fuse.js";
 
-//---------------------------Interfaces, CSS objects && arrays--------------------------------------------------
+//---------------------------Interfaces, CSS objects && "global" arrays--------------------------------------------------
 interface FileViewerProps {
   directory: any;
   firstLoadFiles: any;
@@ -16,19 +16,26 @@ const fileContainerStyles: CSSProperties = {
   width: "70vw",
 };
 
-const selectInputsStyles:CSSProperties={
+const noFilesMessage: CSSProperties = {
+  display: "flex",
+  height: "80%",
+  justifyContent: "center",
+  alignItems: "center",
+};
+
+const selectInputsStyles: CSSProperties = {
   margin: "1px 0",
   display: "flex",
   alignItems: "center",
   gap: "10px",
-}
+};
 
-const fileContainerDivStyle:CSSProperties={
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    margin: "1px",
-}
+const fileContainerDivStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  margin: "1px",
+};
 
 const fileContainerStylesInner: CSSProperties = {
   margin: "0 auto",
@@ -40,31 +47,30 @@ const fileContainerStylesInner: CSSProperties = {
   height: "65vh",
 };
 
-
-const SORTING__OPTIONS: string[] = [
+const SORTING_OPTIONS: string[] = [
   "Sort by",
   "A-Z",
   "Z-A",
   "Newest",
   "Oldest",
   "Biggest",
-  "Smallest"
+  "Smallest",
 ];
 
-
-
-
 //------------------------End of interfaces and CSS objects-------------------------------------------------
+
+
+
 
 export const FileViewer = (props: FileViewerProps) => {
   const { directory, firstLoadFiles } = props;
   const SETTER_URL: any = "http://localhost:8080/setter";
   const GETTER_URL: String = "http://localhost:8080/files";
-  const [list, setList] = useState<any>([]);
-  const [files, setFiles] = useState<any>([]);
-  const [filesArchive, setFilesArchive] = useState<any>([]);
-  const [path, setPath] = useState<string>("");
-  const [paths, setPaths] = useState<any>([]);
+  const [list, setList] = useState<any>([]); //Used to keep track of available paths
+  const [files, setFiles] = useState<any>([]); //Used to old all the files and info from the backend
+  const [filesArchive, setFilesArchive] = useState<any>([]); //Keeps track of files in current directory in order properly implement the search function
+  const [path, setPath] = useState<string>(""); //Stores the current path
+  const [paths, setPaths] = useState<any>([]); //Holds an array of paths
 
   const fuse = new Fuse(filesArchive, {
     minMatchCharLength: 1,
@@ -75,6 +81,7 @@ export const FileViewer = (props: FileViewerProps) => {
   //----------------------------------React effects-------------------------------------------------------------
   useEffect(() => {
     if (directory) {
+      //On the when first loading the main app or reloading it sets the files the that on the children of the original path
       const root = directory[0];
       setList(directory);
       setFiles(firstLoadFiles);
@@ -87,6 +94,7 @@ export const FileViewer = (props: FileViewerProps) => {
 
   useEffect(() => {
     if (path) {
+      //When the path is changed it re-fetches the files from the backend
       const getList = async () => {
         try {
           const res = await fetch(`${GETTER_URL}`);
@@ -108,6 +116,7 @@ export const FileViewer = (props: FileViewerProps) => {
 
   //----------------------------Functions and event listeners-----------------------------------------------
 
+  //Keeps track of previous path in order to back track with the handlePrev function
   function updatePaths(param: String) {
     setPaths((items: any) => [...items, param]);
   }
@@ -115,7 +124,7 @@ export const FileViewer = (props: FileViewerProps) => {
   /**
    * Accepts a param and creates a post request which inturn populates the GETTER_URL with the relevant files
    * All request "paths" are only able to come from existing paths already retrieved form the backend, no unreachable
-   * paths are able to make it through, though some paths to lead to an empty folder/file as
+   * paths are able to make it through, though some paths to lead to an empty folder/file as they might be empty
    */
   const handleRedirect = (param: any) => {
     const redirection = param;
@@ -141,12 +150,16 @@ export const FileViewer = (props: FileViewerProps) => {
     }
   };
 
+  // Uses the available paths in the select input to determine which path to redirect to with the handleRedirect function
   const handleChange = (Event: SelectChangeEvent) => {
-    handleRedirect(Event.target.value);
+    if (Event.target.value) {
+      handleRedirect(Event.target.value);
+    }
   };
 
+  //Check the id of the file clicked on and passes that to the
   const handleClick = (Event: any) => {
-    if (Event?.target) {
+    if (Event?.currentTarget) {
       const path = Event.currentTarget.id;
       handleRedirect(path);
     }
@@ -184,6 +197,7 @@ export const FileViewer = (props: FileViewerProps) => {
     }
   };
 
+  //When the page is refreshed it sends a post request to the backend to repopulate the files with that of the original path
   const handleRefresh = () => {
     if (directory) {
       const redirection = directory[0].path;
@@ -191,23 +205,28 @@ export const FileViewer = (props: FileViewerProps) => {
     }
   };
 
-  const searchHandler = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (e.currentTarget["search-file"].value) {
-      const searchedRequest = e.currentTarget["search-file"].value;
+  /**
+   * Gets a string value from the text field and uses fuse js to match it with the available data of the files.
+   */
+  const searchHandler = (Event: FormEvent<HTMLFormElement>) => {
+    Event.preventDefault();
+    if (Event.currentTarget["search-file"].value) {
+      const searchedRequest = Event.currentTarget["search-file"].value;
       if (searchedRequest != "") {
         const results = fuse.search(searchedRequest);
         const mappedResult = results.map((item: any) => item.item);
         setFiles(mappedResult);
-        e.currentTarget.reset();
+        Event.currentTarget.reset();
       }
     }
   };
 
   window.addEventListener("beforeunload", handleRefresh);
 
-
-
+  /**
+   * Basic switch case to handle the change events of the select input, the value of the options will determine how the
+   * files are sorted.
+   */
   const handleSortBy = (e: SelectChangeEvent) => {
     const valueSelect = e.target.value;
     let sortedResult: any[] = [];
@@ -225,45 +244,36 @@ export const FileViewer = (props: FileViewerProps) => {
       case "Newest":
         sortedResult = [...files].sort(
           (a, b) =>
-            new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime()
+            new Date(b.lastModified).getTime() -
+            new Date(a.lastModified).getTime()
         );
         break;
       case "Oldest":
         sortedResult = [...files].sort(
           (a, b) =>
-            new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime()
-        );  
+            new Date(a.lastModified).getTime() -
+            new Date(b.lastModified).getTime()
+        );
         break;
-        case "Biggest":
-          sortedResult = [...files].sort(
-            (a, b) =>
-            b.size - a.size
-          );
-          break;
-        case "Smallest":
-          sortedResult = [...files].sort(
-            (a, b) =>
-              a.size - b.size
-          );  
-          break;  
-        
+      case "Biggest":
+        sortedResult = [...files].sort((a, b) => b.size - a.size);
+        break;
+      case "Smallest":
+        sortedResult = [...files].sort((a, b) => a.size - b.size);
+        break;
+
       default:
         sortedResult = files;
     }
     setFiles(sortedResult);
   };
 
-
-
   //-------------------------End of functions and event listeners--------------------------------------------------
 
   return (
     <div>
       <div id="file-container" style={fileContainerStyles}>
-        <div
-          id="inputs"
-          style={fileContainerDivStyle}
-        >
+        <div id="inputs" style={fileContainerDivStyle}>
           <div id="inputs-search" style={{ marginRight: "auto" }}>
             <form
               style={{ display: "flex", alignItems: "center" }}
@@ -279,22 +289,14 @@ export const FileViewer = (props: FileViewerProps) => {
             </form>
           </div>
 
-          <div
-            id="inputs-select"
-            style={selectInputsStyles}
-          >
+          <div id="inputs-select" style={selectInputsStyles}>
             {paths.length > 1 && (
               <IconButton color="primary" onClick={handlePrev}>
                 <KeyboardBackspaceIcon fontSize="small" />
               </IconButton>
             )}
 
-            <Select
-              native
-              id="path-select"
-              onChange={handleChange}
-              value="1"
-            >
+            <Select native id="path-select" onChange={handleChange} value="1">
               {path && <option>{path}</option>}
               {list?.map((name: any, index: any) => (
                 <option key={name + index} value={name.path}>
@@ -309,26 +311,30 @@ export const FileViewer = (props: FileViewerProps) => {
             <div>Name</div>
             <div>Size</div>
             <div>Type</div>
-            <div style={{display:"flex", alignItems:"center", justifyContent:"space-between"}}>
-            Date modified
-             <Select
-              native
-              id="sort-select"
-              onChange={handleSortBy}
-              value="1"
-              color="success"
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
             >
-              {SORTING__OPTIONS?.map((item: string, index: number) => (
-                <option key={index} value={item}>
-                {item}
-              </option>
-              ))}
-            </Select>
+              Date modified
+              <Select
+                native
+                id="sort-select"
+                onChange={handleSortBy}
+                value="1"
+                color="success"
+              >
+                {SORTING_OPTIONS?.map((item: string, index: number) => (
+                  <option key={index} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </Select>
             </div>
-            
-           
           </div>
-          {files?.map((element: any, index: number) => {
+          { files?.length !=0 && files?.map((element: any, index: number) => {
             return (
               <ListItemFile
                 id={element.path}
@@ -341,6 +347,8 @@ export const FileViewer = (props: FileViewerProps) => {
               />
             );
           })}
+
+         { files?.length ==0 && <div style={noFilesMessage}>No files to show in current directory</div>}
         </div>
       </div>
     </div>
