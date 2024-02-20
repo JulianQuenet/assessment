@@ -295,9 +295,9 @@ export const FileViewer = (props: FileViewerProps) => {
 
             <Select native id="path-select" onChange={handleChange} value="1">
               {path && <option>{path}</option>}
-              {list?.map((name: any, index: any) => (
-                <option key={name + index} value={name.path}>
-                  {name.path}
+              {list?.map((Element: any, index: any) => (
+                <option key={Element + index} value={Element.path}>
+                  {Element.path}
                 </option>
               ))}
             </Select>
