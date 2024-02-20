@@ -59,9 +59,6 @@ const SORTING_OPTIONS: string[] = [
 
 //------------------------End of interfaces and CSS objects-------------------------------------------------
 
-
-
-
 export const FileViewer = (props: FileViewerProps) => {
   const { directory, firstLoadFiles } = props;
   const SETTER_URL: any = "http://localhost:8080/setter";
@@ -112,7 +109,7 @@ export const FileViewer = (props: FileViewerProps) => {
     }
   }, [path]);
 
-  //---------------------------End of react effects--------------------------------------------------------
+  //---------------------------End of react effects---------------------------------------------------------
 
   //----------------------------Functions and event listeners-----------------------------------------------
 
@@ -334,21 +331,26 @@ export const FileViewer = (props: FileViewerProps) => {
               </Select>
             </div>
           </div>
-          { files?.length !=0 && files?.map((element: any, index: number) => {
-            return (
-              <ListItemFile
-                id={element.path}
-                onClick={handleClick}
-                key={index}
-                name={element.name}
-                size={element.size}
-                date={element.lastModified}
-                type={element.type}
-              />
-            );
-          })}
+          {files?.length != 0 &&
+            files?.map((element: any, index: number) => {
+              return (
+                <ListItemFile
+                  id={element.path}
+                  onClick={handleClick}
+                  key={index}
+                  name={element.name}
+                  size={element.size}
+                  date={element.lastModified}
+                  type={element.type}
+                />
+              );
+            })}
 
-         { files?.length ==0 && <div style={noFilesMessage}>No files to show in current directory</div>}
+          {files?.length == 0 && (
+            <div style={noFilesMessage}>
+              No files to show in current directory
+            </div>
+          )}
         </div>
       </div>
     </div>
